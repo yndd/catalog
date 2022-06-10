@@ -7,6 +7,7 @@ import (
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	targetv1 "github.com/yndd/target/apis/target/v1"
 	topologyv1alpha1 "github.com/yndd/topology/apis/topo/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type Catalog interface {
@@ -18,6 +19,9 @@ type Catalog interface {
 type Fn func(in *Input) (resource.Managed, error)
 
 type Input struct {
+	TypeMeta   metav1.TypeMeta
+	ObjectMeta metav1.ObjectMeta
+	//
 	Meta   map[string]interface{}
 	Object interface{}
 	Data   interface{}

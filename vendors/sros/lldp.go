@@ -3,7 +3,7 @@ package sros
 import (
 	"github.com/yndd/catalog"
 	"github.com/yndd/ndd-runtime/pkg/resource"
-	statev1alpha "github.com/yndd/state/apis/state/v1alpha1"
+	statev1alpha1 "github.com/yndd/state/apis/state/v1alpha1"
 	targetv1 "github.com/yndd/target/apis/target/v1"
 )
 
@@ -33,5 +33,5 @@ func ConfigureLLDP(in *catalog.Input) (resource.Managed, error) {
 }
 
 func StateLLDP(in *catalog.Input) (resource.Managed, error) {
-	return &statev1alpha.State{}, nil
+	return &statev1alpha1.State{}, nil
 }

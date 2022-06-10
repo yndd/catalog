@@ -5,9 +5,9 @@ import (
 
 	"github.com/openconfig/ygot/ygot"
 	"github.com/yndd/catalog"
-	configsrlv1alpha "github.com/yndd/config-srl/apis/srl/v1alpha1"
+	configsrlv1alpha1 "github.com/yndd/config-srl/apis/srl/v1alpha1"
 	"github.com/yndd/ndd-runtime/pkg/resource"
-	statev1alpha "github.com/yndd/state/apis/state/v1alpha1"
+	statev1alpha1 "github.com/yndd/state/apis/state/v1alpha1"
 	"github.com/yndd/state/pkg/ygotnddpstate"
 	targetv1 "github.com/yndd/target/apis/target/v1"
 	"github.com/yndd/ygotsrl"
@@ -78,8 +78,10 @@ func EnableLLDP(in *catalog.Input) (resource.Managed, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &configsrlv1alpha.SrlConfig{
-		Spec: configsrlv1alpha.ConfigSpec{
+	return &configsrlv1alpha1.SrlConfig{
+		TypeMeta:   in.TypeMeta,
+		ObjectMeta: in.ObjectMeta,
+		Spec: configsrlv1alpha1.ConfigSpec{
 			Properties: runtime.RawExtension{Raw: b},
 		},
 	}, nil
@@ -97,8 +99,10 @@ func DisableLLDP(in *catalog.Input) (resource.Managed, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &configsrlv1alpha.SrlConfig{
-		Spec: configsrlv1alpha.ConfigSpec{
+	return &configsrlv1alpha1.SrlConfig{
+		TypeMeta:   in.TypeMeta,
+		ObjectMeta: in.ObjectMeta,
+		Spec: configsrlv1alpha1.ConfigSpec{
 			Properties: runtime.RawExtension{Raw: b},
 		},
 	}, nil
@@ -118,8 +122,10 @@ func StateLLDP(in *catalog.Input) (resource.Managed, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &statev1alpha.State{
-		Spec: statev1alpha.StateSpec{
+	return &statev1alpha1.State{
+		TypeMeta:   in.TypeMeta,
+		ObjectMeta: in.ObjectMeta,
+		Spec: statev1alpha1.StateSpec{
 			Properties: runtime.RawExtension{
 				Raw: b,
 			},
