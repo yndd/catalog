@@ -1,8 +1,7 @@
-package srl
+package sros
 
 import (
 	"github.com/yndd/catalog"
-	configsrlv1alpha "github.com/yndd/config-srl/apis/srl/v1alpha1"
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	statev1alpha "github.com/yndd/state/apis/state/v1alpha1"
 	targetv1 "github.com/yndd/target/apis/target/v1"
@@ -16,21 +15,21 @@ var Fns = map[catalog.FnKey]catalog.Fn{
 	{
 		Name:      "configure_lldp",
 		Version:   "latest",
-		Vendor:    targetv1.VendorTypeNokiaSRL,
+		Vendor:    targetv1.VendorTypeNokiaSROS,
 		Platform:  "",
 		SwVersion: "",
 	}: ConfigureLLDP,
 	{
 		Name:      "state_lldp",
 		Version:   "latest",
-		Vendor:    targetv1.VendorTypeNokiaSRL,
+		Vendor:    targetv1.VendorTypeNokiaSROS,
 		Platform:  "",
 		SwVersion: "",
 	}: StateLLDP,
 }
 
 func ConfigureLLDP(in *catalog.Input) (resource.Managed, error) {
-	return &configsrlv1alpha.SrlConfig{}, nil
+	return nil, nil
 }
 
 func StateLLDP(in *catalog.Input) (resource.Managed, error) {

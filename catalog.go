@@ -6,11 +6,13 @@ import (
 
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	targetv1 "github.com/yndd/target/apis/target/v1"
+	topologyv1alpha1 "github.com/yndd/topology/apis/topo/v1alpha1"
 )
 
 type Catalog interface {
 	GetFn(fnKey FnKey) (Fn, error)
 	RegisterFn(fnKey FnKey, fn Fn)
+	List() []FnKey
 }
 
 type Fn func(in *Input) (resource.Managed, error)
@@ -55,8 +57,42 @@ func (c *catalog) RegisterFn(key FnKey, fn Fn) {
 	c.fns[key] = fn
 }
 
+func (c *catalog) List() []FnKey {
+	c.m.RLock()
+	defer c.m.RLock()
+	r := make([]FnKey, 0, len(c.fns))
+	for k := range c.fns {
+		r = append(r, k)
+	}
+	return r
+}
+
 func RegisterFns(c Catalog, fns map[FnKey]Fn) {
 	for k, v := range fns {
 		c.RegisterFn(k, v)
 	}
+}
+
+func GetFn(c Catalog, name, version string, in *Input) (resource.Managed, error) {
+	key := FnKey{
+		Name:    name,
+		Version: version,
+	}
+	switch obj := in.Object.(type) {
+	case targetv1.Target:
+		key.Vendor = obj.Spec.Properties.VendorType
+		key.Platform = obj.Spec.DiscoveryInfo.Platform
+		key.SwVersion = obj.Spec.DiscoveryInfo.SwVersion
+	case topologyv1alpha1.Node:
+		key.Vendor = obj.Spec.Properties.VendorType
+		key.Platform = obj.Spec.Properties.Platform
+		key.SwVersion = obj.Spec.Properties.ExpectedSWVersion
+	default:
+		return nil, errors.New("unexpected obj type")
+	}
+	fn, err := c.GetFn(key)
+	if err != nil {
+		return nil, err
+	}
+	return fn(in)
 }
