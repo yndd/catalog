@@ -67,7 +67,7 @@ func ConfigureLLDP(in *catalog.Input) (resource.Managed, error) {
 }
 
 func EnableLLDP(in *catalog.Input) (resource.Managed, error) {
-	d := ygotsrl.Device{
+	d := &ygotsrl.Device{
 		System: &ygotsrl.SrlNokiaSystem_System{
 			Lldp: &ygotsrl.SrlNokiaSystem_System_Lldp{
 				AdminState: ygotsrl.SrlNokiaCommon_AdminState_enable,
@@ -88,7 +88,7 @@ func EnableLLDP(in *catalog.Input) (resource.Managed, error) {
 }
 
 func DisableLLDP(in *catalog.Input) (resource.Managed, error) {
-	d := ygotsrl.Device{
+	d := &ygotsrl.Device{
 		System: &ygotsrl.SrlNokiaSystem_System{
 			Lldp: &ygotsrl.SrlNokiaSystem_System_Lldp{
 				AdminState: ygotsrl.SrlNokiaCommon_AdminState_disable,
@@ -114,7 +114,7 @@ func StateLLDP(in *catalog.Input) (resource.Managed, error) {
 		// "system/lldp/chassis-id-type",
 		"system/lldp/interface[name=*]/neighbor[name=*]",
 	}
-	d := ygotnddpstate.YnddState_StateEntry{
+	d := &ygotnddpstate.YnddState_StateEntry{
 		Name: pointer.String("lldp_state"),
 		Path: paths,
 	}
