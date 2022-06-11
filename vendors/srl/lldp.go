@@ -6,6 +6,7 @@ import (
 	"github.com/openconfig/ygot/ygot"
 	"github.com/yndd/catalog"
 	configsrlv1alpha1 "github.com/yndd/config-srl/apis/srl/v1alpha1"
+	nddv1 "github.com/yndd/ndd-runtime/apis/common/v1"
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	statev1alpha1 "github.com/yndd/state/apis/state/v1alpha1"
 	"github.com/yndd/state/pkg/ygotnddpstate"
@@ -67,6 +68,10 @@ func ConfigureLLDP(in *catalog.Input) (resource.Managed, error) {
 }
 
 func EnableLLDP(in *catalog.Input) (resource.Managed, error) {
+	t, err := in.GetTarget()
+	if err != nil {
+		return nil, err
+	}
 	d := &ygotsrl.Device{
 		System: &ygotsrl.SrlNokiaSystem_System{
 			Lldp: &ygotsrl.SrlNokiaSystem_System_Lldp{
@@ -81,12 +86,21 @@ func EnableLLDP(in *catalog.Input) (resource.Managed, error) {
 	return &configsrlv1alpha1.SrlConfig{
 		ObjectMeta: in.ObjectMeta,
 		Spec: configsrlv1alpha1.ConfigSpec{
+			ResourceSpec: nddv1.ResourceSpec{
+				TargetReference: &nddv1.Reference{
+					Name: t.GetName(),
+				},
+			},
 			Properties: runtime.RawExtension{Raw: b},
 		},
 	}, nil
 }
 
 func DisableLLDP(in *catalog.Input) (resource.Managed, error) {
+	t, err := in.GetTarget()
+	if err != nil {
+		return nil, err
+	}
 	d := &ygotsrl.Device{
 		System: &ygotsrl.SrlNokiaSystem_System{
 			Lldp: &ygotsrl.SrlNokiaSystem_System_Lldp{
@@ -101,12 +115,21 @@ func DisableLLDP(in *catalog.Input) (resource.Managed, error) {
 	return &configsrlv1alpha1.SrlConfig{
 		ObjectMeta: in.ObjectMeta,
 		Spec: configsrlv1alpha1.ConfigSpec{
+			ResourceSpec: nddv1.ResourceSpec{
+				TargetReference: &nddv1.Reference{
+					Name: t.GetName(),
+				},
+			},
 			Properties: runtime.RawExtension{Raw: b},
 		},
 	}, nil
 }
 
 func StateLLDP(in *catalog.Input) (resource.Managed, error) {
+	t, err := in.GetTarget()
+	if err != nil {
+		return nil, err
+	}
 	paths := []string{
 		// "system/lldp/chassis-id",
 		// "system/lldp/chassis-id-type",
@@ -123,9 +146,13 @@ func StateLLDP(in *catalog.Input) (resource.Managed, error) {
 	return &statev1alpha1.State{
 		ObjectMeta: in.ObjectMeta,
 		Spec: statev1alpha1.StateSpec{
-			Properties: runtime.RawExtension{
-				Raw: b,
+			ResourceSpec: nddv1.ResourceSpec{
+				Lifecycle: nddv1.Lifecycle{},
+				TargetReference: &nddv1.Reference{
+					Name: t.GetName(),
+				},
 			},
+			Properties: runtime.RawExtension{Raw: b},
 		},
 	}, nil
 }

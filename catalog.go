@@ -82,11 +82,11 @@ func GetFn(c Catalog, name, version string, in *Input) (resource.Managed, error)
 		Version: version,
 	}
 	switch obj := in.Object.(type) {
-	case targetv1.Target:
+	case *targetv1.Target:
 		key.Vendor = obj.Spec.Properties.VendorType
 		key.Platform = obj.Spec.DiscoveryInfo.Platform
 		key.SwVersion = obj.Spec.DiscoveryInfo.SwVersion
-	case topologyv1alpha1.Node:
+	case *topologyv1alpha1.Node:
 		key.Vendor = obj.Spec.Properties.VendorType
 		key.Platform = obj.Spec.Properties.Platform
 		key.SwVersion = obj.Spec.Properties.ExpectedSWVersion
@@ -98,4 +98,22 @@ func GetFn(c Catalog, name, version string, in *Input) (resource.Managed, error)
 		return nil, err
 	}
 	return fn(in)
+}
+
+func (in *Input) GetTarget() (*targetv1.Target, error) {
+	switch obj := in.Object.(type) {
+	case *targetv1.Target:
+		return obj, nil
+	default:
+		return nil, errors.New("unexpected obj type")
+	}
+}
+
+func (in *Input) GetNode() (*topologyv1alpha1.Node, error) {
+	switch obj := in.Object.(type) {
+	case *topologyv1alpha1.Node:
+		return obj, nil
+	default:
+		return nil, errors.New("unexpected obj type")
+	}
 }
