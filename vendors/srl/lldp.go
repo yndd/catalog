@@ -133,7 +133,7 @@ func StateLLDP(in *catalog.Input) (resource.Managed, error) {
 	paths := []string{
 		// "system/lldp/chassis-id",
 		// "system/lldp/chassis-id-type",
-		"system/lldp/interface[name=*]/neighbor[name=*]",
+		"/system/lldp/interface[name=*]/neighbor[id=*]",
 	}
 	d := &ygotnddpstate.YnddState_StateEntry{
 		Name: pointer.String("lldp_state"),
