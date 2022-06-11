@@ -6,7 +6,7 @@ require github.com/yndd/ndd-runtime v0.5.18
 
 require (
 	github.com/openconfig/ygot v0.23.0
-	github.com/yndd/config-srl v0.0.1
+	github.com/yndd/config-srl v0.0.2
 	github.com/yndd/state v0.0.2
 	github.com/yndd/target v0.0.100
 	github.com/yndd/topology v0.0.7
