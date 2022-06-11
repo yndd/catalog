@@ -79,7 +79,6 @@ func EnableLLDP(in *catalog.Input) (resource.Managed, error) {
 		return nil, err
 	}
 	return &configsrlv1alpha1.SrlConfig{
-		TypeMeta:   in.TypeMeta,
 		ObjectMeta: in.ObjectMeta,
 		Spec: configsrlv1alpha1.ConfigSpec{
 			Properties: runtime.RawExtension{Raw: b},
@@ -100,7 +99,6 @@ func DisableLLDP(in *catalog.Input) (resource.Managed, error) {
 		return nil, err
 	}
 	return &configsrlv1alpha1.SrlConfig{
-		TypeMeta:   in.TypeMeta,
 		ObjectMeta: in.ObjectMeta,
 		Spec: configsrlv1alpha1.ConfigSpec{
 			Properties: runtime.RawExtension{Raw: b},
@@ -123,7 +121,6 @@ func StateLLDP(in *catalog.Input) (resource.Managed, error) {
 		return nil, err
 	}
 	return &statev1alpha1.State{
-		TypeMeta:   in.TypeMeta,
 		ObjectMeta: in.ObjectMeta,
 		Spec: statev1alpha1.StateSpec{
 			Properties: runtime.RawExtension{

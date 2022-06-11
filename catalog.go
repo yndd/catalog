@@ -19,7 +19,6 @@ type Catalog interface {
 type Fn func(in *Input) (resource.Managed, error)
 
 type Input struct {
-	TypeMeta   metav1.TypeMeta
 	ObjectMeta metav1.ObjectMeta
 	//
 	Meta   map[string]interface{}
