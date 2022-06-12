@@ -2,6 +2,7 @@ package srl
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/openconfig/ygot/ygot"
 	"github.com/yndd/catalog"
@@ -143,6 +144,12 @@ func StateLLDP(in *catalog.Input) (resource.Managed, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if in.ObjectMeta.Annotations == nil {
+		in.ObjectMeta.Annotations = make(map[string]string)
+	}
+	in.ObjectMeta.Annotations["state.yndd.io/paths"] = strings.Join(paths, ",")
+
 	return &statev1alpha1.State{
 		ObjectMeta: in.ObjectMeta,
 		Spec: statev1alpha1.StateSpec{
