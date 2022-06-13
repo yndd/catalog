@@ -35,6 +35,13 @@ type FnKey struct {
 	SwVersion string
 }
 
+func New() Catalog {
+	return &catalog{
+		m:   &sync.RWMutex{},
+		fns: map[FnKey]Fn{},
+	}
+}
+
 type catalog struct {
 	m   *sync.RWMutex
 	fns map[FnKey]Fn
