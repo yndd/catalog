@@ -18,48 +18,86 @@ import (
 )
 
 func init() {
-	catalog.RegisterFns(catalog.Default, Fns)
+	catalog.RegisterEntries(catalog.Default, Entries)
 }
 
-var Fns = map[catalog.FnKey]catalog.Fn{
+var Entries = map[catalog.Key]catalog.Entry{
 	{
 		Name:      "configure_lldp",
 		Version:   "latest",
 		Vendor:    targetv1.VendorTypeNokiaSRL,
 		Platform:  "",
 		SwVersion: "",
-	}: ConfigureLLDP,
+	}: {
+		RenderRn: ConfigureLLDP,
+		ResourceFn: func() resource.Managed {
+			return &configsrlv1alpha1.SrlConfig{}
+		},
+		ResourceListFn: func() resource.ManagedList {
+			return &configsrlv1alpha1.SrlConfigList{}
+		},
+		MergeFn: configSRLMergeFn,
+	},
 	{
 		Name:      "enable_lldp",
 		Version:   "latest",
 		Vendor:    targetv1.VendorTypeNokiaSRL,
 		Platform:  "",
 		SwVersion: "",
-	}: EnableLLDP,
+	}: {
+		RenderRn: EnableLLDP,
+		ResourceFn: func() resource.Managed {
+			return &configsrlv1alpha1.SrlConfig{}
+		},
+		ResourceListFn: func() resource.ManagedList {
+			return &configsrlv1alpha1.SrlConfigList{}
+		},
+		MergeFn: configSRLMergeFn,
+	},
 	{
 		Name:      "disable_lldp",
 		Version:   "latest",
 		Vendor:    targetv1.VendorTypeNokiaSRL,
 		Platform:  "",
 		SwVersion: "",
-	}: DisableLLDP,
+	}: {
+		RenderRn: DisableLLDP,
+		ResourceFn: func() resource.Managed {
+			return &configsrlv1alpha1.SrlConfig{}
+		},
+		ResourceListFn: func() resource.ManagedList {
+			return &configsrlv1alpha1.SrlConfigList{}
+		},
+		MergeFn: configSRLMergeFn,
+	},
 	{
 		Name:      "state_lldp",
 		Version:   "latest",
 		Vendor:    targetv1.VendorTypeNokiaSRL,
 		Platform:  "",
 		SwVersion: "",
-	}: StateLLDP,
+	}: {
+		RenderRn: StateLLDP,
+		ResourceFn: func() resource.Managed {
+			return &statev1alpha1.State{}
+		},
+		ResourceListFn: func() resource.ManagedList {
+			return &statev1alpha1.StateList{}
+		},
+		MergeFn: func(crs ...resource.Managed) (resource.Managed, error) {
+			return nil, nil
+		},
+	},
 }
 
-func ConfigureLLDP(in *catalog.Input) (resource.Managed, error) {
+func ConfigureLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 	switch data := in.Data.(type) {
 	case string: // TODO: use a more elaborate data input type
 		switch data {
 		case "enable":
-			return EnableLLDP(in)
+			return EnableLLDP(key, in)
 		case "disable":
-			return DisableLLDP(in)
+			return DisableLLDP(key, in)
 		default:
 			return nil, errors.New("unexpected data value")
 		}
@@ -68,7 +106,7 @@ func ConfigureLLDP(in *catalog.Input) (resource.Managed, error) {
 	}
 }
 
-func EnableLLDP(in *catalog.Input) (resource.Managed, error) {
+func EnableLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 	t, err := in.GetTarget()
 	if err != nil {
 		return nil, err
@@ -97,7 +135,7 @@ func EnableLLDP(in *catalog.Input) (resource.Managed, error) {
 	}, nil
 }
 
-func DisableLLDP(in *catalog.Input) (resource.Managed, error) {
+func DisableLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 	t, err := in.GetTarget()
 	if err != nil {
 		return nil, err
@@ -126,7 +164,7 @@ func DisableLLDP(in *catalog.Input) (resource.Managed, error) {
 	}, nil
 }
 
-func StateLLDP(in *catalog.Input) (resource.Managed, error) {
+func StateLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 	t, err := in.GetTarget()
 	if err != nil {
 		return nil, err

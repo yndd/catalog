@@ -11,12 +11,22 @@ import (
 )
 
 type Catalog interface {
-	GetFn(fnKey FnKey) (Fn, error)
-	RegisterFn(fnKey FnKey, fn Fn)
-	List() []FnKey
+	Get(key Key) (Entry, error)
+	Register(key Key, e Entry)
+	Merge(c ...Catalog)
+	List() []Key
 }
 
-type Fn func(in *Input) (resource.Managed, error)
+type Fn func(key Key, in *Input) (resource.Managed, error)
+
+type MergeFn func(crs ...resource.Managed) (resource.Managed, error)
+
+type Entry struct {
+	RenderRn       Fn
+	ResourceFn     func() resource.Managed
+	ResourceListFn func() resource.ManagedList
+	MergeFn        MergeFn
+}
 
 type Input struct {
 	ParentInput *Input
@@ -27,7 +37,7 @@ type Input struct {
 	Data   interface{}
 }
 
-type FnKey struct {
+type Key struct {
 	Name    string
 	Version string
 	//
@@ -36,76 +46,66 @@ type FnKey struct {
 	SwVersion string
 }
 
-func New() Catalog {
-	return &catalog{
-		m:   &sync.RWMutex{},
-		fns: map[FnKey]Fn{},
-	}
+type catalog struct {
+	m       *sync.RWMutex
+	entries map[Key]Entry
 }
 
-type catalog struct {
-	m   *sync.RWMutex
-	fns map[FnKey]Fn
+func New(scs ...Catalog) Catalog {
+	c := &catalog{
+		m:       &sync.RWMutex{},
+		entries: map[Key]Entry{},
+	}
+	c.Merge(scs...)
+	return c
 }
 
 var Default = &catalog{
-	m:   &sync.RWMutex{},
-	fns: map[FnKey]Fn{},
+	m:       &sync.RWMutex{},
+	entries: make(map[Key]Entry),
 }
 
-func (c *catalog) GetFn(key FnKey) (Fn, error) {
+func (c *catalog) Get(key Key) (Entry, error) {
 	c.m.RLock()
 	defer c.m.RUnlock()
-	if f, ok := c.fns[key]; ok {
+	if f, ok := c.entries[key]; ok {
 		return f, nil
 	}
-	return nil, errors.New("not found")
+	return Entry{}, errors.New("not found")
 }
 
-func (c *catalog) RegisterFn(key FnKey, fn Fn) {
+func (c *catalog) Register(key Key, e Entry) {
 	c.m.Lock()
 	defer c.m.Unlock()
-	c.fns[key] = fn
+	c.entries[key] = e
 }
 
-func (c *catalog) List() []FnKey {
+func (c *catalog) Merge(scs ...Catalog) {
+	for _, sc := range scs {
+		for _, k := range sc.List() {
+			e, err := sc.Get(k)
+			if err != nil {
+				continue
+			}
+			c.Register(k, e)
+		}
+	}
+}
+
+func (c *catalog) List() []Key {
 	c.m.RLock()
 	defer c.m.RLock()
-	r := make([]FnKey, 0, len(c.fns))
-	for k := range c.fns {
+	r := make([]Key, 0, len(c.entries))
+	for k := range c.entries {
 		r = append(r, k)
 	}
 	return r
 }
 
-func RegisterFns(c Catalog, fns map[FnKey]Fn) {
+func RegisterEntries(c Catalog, fns map[Key]Entry) {
 	for k, v := range fns {
-		c.RegisterFn(k, v)
+		c.Register(k, v)
 	}
-}
-
-func GetFn(c Catalog, name, version string, in *Input) (resource.Managed, error) {
-	key := FnKey{
-		Name:    name,
-		Version: version,
-	}
-	switch obj := in.Object.(type) {
-	case *targetv1.Target:
-		key.Vendor = obj.Spec.Properties.VendorType
-		key.Platform = obj.Spec.DiscoveryInfo.Platform
-		key.SwVersion = obj.Spec.DiscoveryInfo.SwVersion
-	case *topologyv1alpha1.Node:
-		key.Vendor = obj.Spec.Properties.VendorType
-		key.Platform = obj.Spec.Properties.Platform
-		key.SwVersion = obj.Spec.Properties.ExpectedSWVersion
-	default:
-		return nil, errors.New("unexpected obj type")
-	}
-	fn, err := c.GetFn(key)
-	if err != nil {
-		return nil, err
-	}
-	return fn(in)
 }
 
 func (in *Input) GetTarget() (*targetv1.Target, error) {

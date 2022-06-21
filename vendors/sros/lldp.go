@@ -8,30 +8,52 @@ import (
 )
 
 func init() {
-	catalog.RegisterFns(catalog.Default, Fns)
+	catalog.RegisterEntries(catalog.Default, Entries)
 }
 
-var Fns = map[catalog.FnKey]catalog.Fn{
+var Entries = map[catalog.Key]catalog.Entry{
 	{
 		Name:      "configure_lldp",
 		Version:   "latest",
 		Vendor:    targetv1.VendorTypeNokiaSROS,
 		Platform:  "",
 		SwVersion: "",
-	}: ConfigureLLDP,
+	}: {
+		RenderRn: ConfigureLLDP,
+		ResourceFn: func() resource.Managed {
+			return nil
+		},
+		ResourceListFn: func() resource.ManagedList {
+			return nil
+		},
+		MergeFn: func(crs ...resource.Managed) (resource.Managed, error) {
+			return nil, nil
+		},
+	},
 	{
 		Name:      "state_lldp",
 		Version:   "latest",
 		Vendor:    targetv1.VendorTypeNokiaSROS,
 		Platform:  "",
 		SwVersion: "",
-	}: StateLLDP,
+	}: {
+		RenderRn: StateLLDP,
+		ResourceFn: func() resource.Managed {
+			return &statev1alpha1.State{}
+		},
+		ResourceListFn: func() resource.ManagedList {
+			return &statev1alpha1.StateList{}
+		},
+		MergeFn: func(crs ...resource.Managed) (resource.Managed, error) {
+			return nil, nil
+		},
+	},
 }
 
-func ConfigureLLDP(in *catalog.Input) (resource.Managed, error) {
+func ConfigureLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 	return nil, nil
 }
 
-func StateLLDP(in *catalog.Input) (resource.Managed, error) {
+func StateLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 	return &statev1alpha1.State{}, nil
 }

@@ -14,7 +14,7 @@ func main() {
 	for _, f := range c.List() {
 		fmt.Printf("%+v\n", f)
 	}
-	fn, err := c.GetFn(catalog.FnKey{
+	fn, err := c.Get(catalog.Key{
 		Name:      "configure_lldp",
 		Version:   "latest",
 		Vendor:    targetv1.VendorTypeNokiaSRL,
@@ -24,5 +24,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(fn)
+	fmt.Printf("%+v\n", fn)
 }
