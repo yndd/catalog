@@ -33,7 +33,7 @@ type Input struct {
 	ObjectMeta  metav1.ObjectMeta // metadata for the returned CR
 	//
 	Meta   map[string]interface{}
-	Object interface{}
+	Object interface{} // target or node or a referenced object
 	Data   interface{}
 }
 
