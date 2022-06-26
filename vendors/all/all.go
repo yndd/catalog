@@ -36,7 +36,12 @@ var Entries = map[catalog.Key]catalog.Entry{
 }
 
 func ConfigureLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
-	switch key.Vendor {
+	t, err := in.GetTarget()
+	if err != nil {
+		return nil, err
+	}
+
+	switch t.GetDiscoveryInfo().VendorType {
 	case targetv1.VendorTypeNokiaSRL:
 		return srl.ConfigureLLDP(key, in)
 	case targetv1.VendorTypeNokiaSROS:
@@ -47,7 +52,11 @@ func ConfigureLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error)
 }
 
 func StateLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
-	switch key.Vendor {
+	t, err := in.GetTarget()
+	if err != nil {
+		return nil, err
+	}
+	switch t.GetDiscoveryInfo().VendorType {
 	case targetv1.VendorTypeNokiaSRL:
 		return srl.StateLLDP(key, in)
 	case targetv1.VendorTypeNokiaSROS:
