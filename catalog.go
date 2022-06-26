@@ -2,6 +2,7 @@ package catalog
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/yndd/ndd-runtime/pkg/resource"
@@ -71,7 +72,7 @@ func (c *catalog) Get(key Key) (Entry, error) {
 	if f, ok := c.entries[key]; ok {
 		return f, nil
 	}
-	return Entry{}, errors.New("not found")
+	return Entry{}, fmt.Errorf("key: %v, not found", key)
 }
 
 func (c *catalog) Register(key Key, e Entry) {
