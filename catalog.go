@@ -29,7 +29,7 @@ type Entry struct {
 	ResourceFn     func() resource.Managed
 	ResourceListFn func() resource.ManagedList
 	MergeFn        MergeFn
-	Key            GetKeyFn
+	GetKeyFn       GetKeyFn
 }
 
 type Input struct {

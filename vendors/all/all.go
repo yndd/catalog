@@ -24,7 +24,7 @@ var Entries = map[catalog.Key]catalog.Entry{
 		ResourceFn:     nil,
 		ResourceListFn: nil,
 		MergeFn:        nil,
-		Key:            GetKey,
+		GetKeyFn:       GetKey,
 	},
 	{
 		Name:    "state_lldp",
