@@ -187,6 +187,7 @@ func StateLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 		in.ObjectMeta.Annotations = make(map[string]string)
 	}
 	in.ObjectMeta.Annotations["state.yndd.io/paths"] = strings.Join(paths, ",")
+	in.ObjectMeta.Name = strings.Join([]string{in.ObjectMeta.Name, t.GetName()}, ".")
 
 	return &statev1alpha1.State{
 		ObjectMeta: in.ObjectMeta,
