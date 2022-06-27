@@ -18,6 +18,8 @@ type Catalog interface {
 	List() []Key
 }
 
+type GetKeyFn func(key Key, in *Input) (Key, error)
+
 type Fn func(key Key, in *Input) (resource.Managed, error)
 
 type MergeFn func(crs ...resource.Managed) (resource.Managed, error)
@@ -27,6 +29,7 @@ type Entry struct {
 	ResourceFn     func() resource.Managed
 	ResourceListFn func() resource.ManagedList
 	MergeFn        MergeFn
+	Key            GetKeyFn
 }
 
 type Input struct {

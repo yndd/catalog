@@ -7,8 +7,8 @@ import (
 	"github.com/yndd/catalog/vendors/srl"
 	"github.com/yndd/catalog/vendors/sros"
 	"github.com/yndd/ndd-runtime/pkg/resource"
-	targetv1 "github.com/yndd/target/apis/target/v1"
 	statev1alpha1 "github.com/yndd/state/apis/state/v1alpha1"
+	targetv1 "github.com/yndd/target/apis/target/v1"
 )
 
 func init() {
@@ -20,16 +20,17 @@ var Entries = map[catalog.Key]catalog.Entry{
 		Name:    "configure_lldp",
 		Version: "latest",
 	}: {
-		RenderRn:       ConfigureLLDP,
+		RenderRn:       nil,
 		ResourceFn:     nil,
 		ResourceListFn: nil,
 		MergeFn:        nil,
+		Key:            GetKey,
 	},
 	{
 		Name:    "state_lldp",
 		Version: "latest",
 	}: {
-		RenderRn:       StateLLDP,
+		RenderRn: StateLLDP,
 		ResourceFn: func() resource.Managed {
 			return &statev1alpha1.State{}
 		},
@@ -42,20 +43,21 @@ var Entries = map[catalog.Key]catalog.Entry{
 	},
 }
 
-func ConfigureLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
+func GetKey(key catalog.Key, in *catalog.Input) (catalog.Key, error) {
 	t, err := in.GetTarget()
 	if err != nil {
-		return nil, err
+		return catalog.Key{}, err
 	}
-	key.Vendor = t.GetDiscoveryInfo().VendorType
 
-	switch t.GetDiscoveryInfo().VendorType {
+	vendor := t.GetDiscoveryInfo().VendorType
+
+	switch vendor {
 	case targetv1.VendorTypeNokiaSRL:
-		return srl.ConfigureLLDP(key, in)
+		return catalog.Key{Name: key.Name, Version: "latest", Vendor: vendor}, nil
 	case targetv1.VendorTypeNokiaSROS:
-		return sros.ConfigureLLDP(key, in)
+		return catalog.Key{Name: key.Name, Version: "latest", Vendor: vendor}, nil
 	default:
-		return nil, fmt.Errorf("unsupported vendorType: %s", key.Vendor)
+		return catalog.Key{}, fmt.Errorf("unsupported vendorType: %s", key.Vendor)
 	}
 }
 
@@ -64,6 +66,8 @@ func StateLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 	if err != nil {
 		return nil, err
 	}
+	key.Vendor = t.GetDiscoveryInfo().VendorType
+
 	switch t.GetDiscoveryInfo().VendorType {
 	case targetv1.VendorTypeNokiaSRL:
 		return srl.StateLLDP(key, in)
