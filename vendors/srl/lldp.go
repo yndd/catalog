@@ -122,6 +122,7 @@ func EnableLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 	if err != nil {
 		return nil, err
 	}
+	in.ObjectMeta.Name = strings.Join([]string{in.ObjectMeta.Name, t.GetName()}, ".")
 	return &configsrlv1alpha1.SrlConfig{
 		ObjectMeta: in.ObjectMeta,
 		Spec: configsrlv1alpha1.ConfigSpec{
@@ -151,6 +152,7 @@ func DisableLLDP(key catalog.Key, in *catalog.Input) (resource.Managed, error) {
 	if err != nil {
 		return nil, err
 	}
+	in.ObjectMeta.Name = strings.Join([]string{in.ObjectMeta.Name, t.GetName()}, ".")
 	return &configsrlv1alpha1.SrlConfig{
 		ObjectMeta: in.ObjectMeta,
 		Spec: configsrlv1alpha1.ConfigSpec{
