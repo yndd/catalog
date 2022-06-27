@@ -21,7 +21,7 @@ var Entries = map[catalog.Key]catalog.Entry{
 		Name:    "configure_lldp",
 		Version: "latest",
 	}: {
-		RenderRn:       nil,
+		RenderFn:       nil,
 		ResourceFn:     nil,
 		ResourceListFn: nil,
 		MergeFn:        nil,
@@ -31,7 +31,7 @@ var Entries = map[catalog.Key]catalog.Entry{
 		Name:    "state_lldp",
 		Version: "latest",
 	}: {
-		RenderRn: StateLLDP,
+		RenderFn: StateLLDP,
 		ResourceFn: func() resource.Managed {
 			return &statev1alpha1.State{}
 		},

@@ -29,7 +29,7 @@ var Entries = map[catalog.Key]catalog.Entry{
 		Platform:  "",
 		SwVersion: "",
 	}: {
-		RenderRn: ConfigureLLDP,
+		RenderFn: ConfigureLLDP,
 		ResourceFn: func() resource.Managed {
 			return &configsrlv1alpha1.SrlConfig{}
 		},
@@ -45,7 +45,7 @@ var Entries = map[catalog.Key]catalog.Entry{
 		Platform:  "",
 		SwVersion: "",
 	}: {
-		RenderRn: EnableLLDP,
+		RenderFn: EnableLLDP,
 		ResourceFn: func() resource.Managed {
 			return &configsrlv1alpha1.SrlConfig{}
 		},
@@ -61,7 +61,7 @@ var Entries = map[catalog.Key]catalog.Entry{
 		Platform:  "",
 		SwVersion: "",
 	}: {
-		RenderRn: DisableLLDP,
+		RenderFn: DisableLLDP,
 		ResourceFn: func() resource.Managed {
 			return &configsrlv1alpha1.SrlConfig{}
 		},
@@ -77,7 +77,7 @@ var Entries = map[catalog.Key]catalog.Entry{
 		Platform:  "",
 		SwVersion: "",
 	}: {
-		RenderRn: StateLLDP,
+		RenderFn: StateLLDP,
 		ResourceFn: func() resource.Managed {
 			return &statev1alpha1.State{}
 		},
