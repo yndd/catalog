@@ -9,6 +9,7 @@ import (
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	statev1alpha1 "github.com/yndd/state/apis/state/v1alpha1"
 	targetv1 "github.com/yndd/target/apis/target/v1"
+	configsrlv1alpha1 "github.com/yndd/config-srl/apis/srl/v1alpha1"
 )
 
 func init() {
@@ -24,7 +25,7 @@ var Entries = map[catalog.Key]catalog.Entry{
 		ResourceFn:     nil,
 		ResourceListFn: nil,
 		MergeFn:        nil,
-		GetKeyFn:       GetKey,
+		GetGvkKeyFn:       GetGvkKey,
 	},
 	{
 		Name:    "state_lldp",
@@ -43,21 +44,21 @@ var Entries = map[catalog.Key]catalog.Entry{
 	},
 }
 
-func GetKey(key catalog.Key, in *catalog.Input) (catalog.Key, error) {
+func GetGvkKey(key catalog.Key, in *catalog.Input) (string, catalog.Key, error) {
 	t, err := in.GetTarget()
 	if err != nil {
-		return catalog.Key{}, err
+		return "", catalog.Key{}, err
 	}
 
 	vendor := t.GetDiscoveryInfo().VendorType
 
 	switch vendor {
 	case targetv1.VendorTypeNokiaSRL:
-		return catalog.Key{Name: key.Name, Version: "latest", Vendor: vendor}, nil
+		return configsrlv1alpha1.SrlConfigKindAPIVersion, catalog.Key{Name: key.Name, Version: "latest", Vendor: vendor}, nil
 	case targetv1.VendorTypeNokiaSROS:
-		return catalog.Key{Name: key.Name, Version: "latest", Vendor: vendor}, nil
+		return "", catalog.Key{Name: key.Name, Version: "latest", Vendor: vendor}, nil
 	default:
-		return catalog.Key{}, fmt.Errorf("unsupported vendorType: %s", key.Vendor)
+		return "", catalog.Key{}, fmt.Errorf("unsupported vendorType: %s", key.Vendor)
 	}
 }
 
